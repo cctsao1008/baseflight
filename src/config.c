@@ -13,7 +13,7 @@ config_t cfg;
 const char rcChannelLetters[] = "AERT1234";
 
 static uint32_t enabledSensors = 0;
-static uint8_t checkNewConf = 11;
+static uint8_t checkNewConf = 16;
 
 void parseRcChannels(const char *input)
 {
@@ -79,7 +79,13 @@ void checkFirstTime(bool reset)
 
     // Default settings
     cfg.version = checkNewConf;
+
+	#ifdef modify_it
+	cfg.mixerConfiguration = MULTITYPE_HEX6X;
+	#else
     cfg.mixerConfiguration = MULTITYPE_QUADX;
+	#endif
+	
     featureClearAll();
     featureSet(FEATURE_VBAT); // | FEATURE_PPM); // sadly, this is for hackers only
 
@@ -121,17 +127,37 @@ void checkFirstTime(bool reset)
     cfg.gyro_smoothing_factor = 0x00141403; // default factors of 20, 20, 3 for R/P/Y
     cfg.powerTrigger1 = 0;
     cfg.vbatscale = 110;
+
+	#ifndef modify_it
+    cfg.vbatmaxcellvoltage = 36;
+    cfg.vbatmincellvoltage = 20;
+	#else
     cfg.vbatmaxcellvoltage = 43;
     cfg.vbatmincellvoltage = 33;
+	#endif
 
     // Radio
     parseRcChannels("AETR1234");
+
+	#ifndef modify_it
+    cfg.deadband = 5;
+    cfg.yawdeadband = 5;
+	#else
     cfg.deadband = 0;
     cfg.yawdeadband = 0;
+	#endif
+	
     cfg.spektrum_hires = 0;
+
+	#ifndef modify_it
+    cfg.midrc = 1520;
+    cfg.mincheck = 1110;
+    cfg.maxcheck = 1930;
+	#else
     cfg.midrc = 1500;
     cfg.mincheck = 1100;
     cfg.maxcheck = 1900;
+	#endif
 
     // Motor/ESC/Servo
     cfg.minthrottle = 1150;
@@ -149,8 +175,14 @@ void checkFirstTime(bool reset)
     cfg.tri_yaw_max = 2000;
 
     // gimbal
-    cfg.tilt_pitch_prop = 10;
-    cfg.tilt_roll_prop = 10;
+    cfg.gimbal_pitch_gain = 10;
+    cfg.gimbal_roll_gain = 10;
+    cfg.gimbal_pitch_min = 1020;
+    cfg.gimbal_pitch_max = 2000;
+    cfg.gimbal_pitch_mid = 1500;
+    cfg.gimbal_roll_min = 1020;
+    cfg.gimbal_roll_max = 2000;
+    cfg.gimbal_roll_mid = 1500;
 
     // gps baud-rate
     cfg.gps_baudrate = 9600;    

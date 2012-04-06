@@ -21,13 +21,22 @@ sensor_t gyro;                  // gyro access functions
 
 void sensorsAutodetect(void)
 {
+    uartPrint("Sensor list : \r\n");
     // Detect what's available
     if (!adxl345Detect(&acc))
         sensorsClear(SENSOR_ACC);
+    else
+        uartPrint("ADXL345\r\n");
+        
     if (!bmp085Init())
         sensorsClear(SENSOR_BARO);
+    else
+        uartPrint("BMP085\r\n");
+        
     if (!hmc5883lDetect())
         sensorsClear(SENSOR_MAG);
+    else
+        uartPrint("HMC5883L\r\n");
 
     // Init sensors
     if (sensors(SENSOR_ACC))

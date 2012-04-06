@@ -101,12 +101,29 @@ static void mpu3050Align(int16_t *gyroData)
 static void mpu3050Read(int16_t *gyroData)
 {
     uint8_t buf[6];
+
+	#ifndef modify_it
+	if(i2cRead(MPU3050_ADDRESS, MPU3050_GYRO_OUT, 6, buf) == true)
+	{
+        gyroData[0] = (buf[0] << 8) | buf[1];
+        gyroData[1] = (buf[2] << 8) | buf[3];
+        gyroData[2] = (buf[4] << 8) | buf[5];
+	}
+	else
+	{
+	    LED1_TOGGLE
+	}
+	#else
     i2cRead(MPU3050_ADDRESS, MPU3050_GYRO_OUT, 6, buf);
     gyroData[0] = (buf[0] << 8) | buf[1];
     gyroData[1] = (buf[2] << 8) | buf[3];
     gyroData[2] = (buf[4] << 8) | buf[5];
+	#endif
 }
 
+#ifndef modify_it
+
+#else
 static int16_t mpu3050ReadTemp(void)
 {
     uint8_t buf[2];
@@ -114,3 +131,4 @@ static int16_t mpu3050ReadTemp(void)
     
     return 35 + ((int32_t)(buf[0] << 8 | buf[1]) + 13200) / 280;
 }
+#endif

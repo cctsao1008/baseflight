@@ -788,10 +788,10 @@
             <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
             <Capability>1</Capability>
-            <DriverSelection>4096</DriverSelection>
+            <DriverSelection>4099</DriverSelection>
           </Flash1>
-          <Flash2>BIN\UL2CM3.DLL</Flash2>
-          <Flash3>"" ()</Flash3>
+          <Flash2>Segger\JL2CM3.dll</Flash2>
+          <Flash3></Flash3>
           <Flash4></Flash4>
         </Utilities>
         <TargetArmAds>
@@ -972,7 +972,7 @@
             <uThumb>0</uThumb>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>STM32F10X_MD,USE_STDPERIPH_DRIVER</Define>
+              <Define>STM32F10X_MD,USE_STDPERIPH_DRIVER,TX_MODE2,USE_ALL_IN_ONE_II</Define>
               <Undefine></Undefine>
               <IncludePath>CoOS\portable;CoOS\kernel;lib\CMSIS\CM3\CoreSupport;lib\CMSIS\CM3\DeviceSupport\ST\STM32F10x;lib\STM32F10x_StdPeriph_Driver\inc</IncludePath>
             </VariousControls>

@@ -389,6 +389,16 @@ void loop(void)
                 } else if (armed)
                     armed = 0;
                 rcDelayCommand = 0;
+            #if !defined(modify_it) && defined(TX_MODE2) // TX MODE2
+            } else if (rcData[YAW] < cfg.mincheck && armed == 1) {
+                if (rcDelayCommand == 20)
+                    armed = 0;  // rcDelayCommand = 20 => 20x20ms = 0.4s = time to wait for a specific RC command to be acknowledged
+            } else if (rcData[YAW] > cfg.maxcheck && rcData[PITCH] < cfg.maxcheck && armed == 0 && calibratingG == 0 && calibratedACC == 1) {
+                if (rcDelayCommand == 20) {
+                    armed = 1;
+                    headFreeModeHold = heading;
+                }
+            #else // TX MODE 1 and MODE2
             } else if ((rcData[YAW] < cfg.mincheck || rcData[ROLL] < cfg.mincheck) && armed == 1) {
                 if (rcDelayCommand == 20)
                     armed = 0;  // rcDelayCommand = 20 => 20x20ms = 0.4s = time to wait for a specific RC command to be acknowledged
@@ -397,6 +407,7 @@ void loop(void)
                     armed = 1;
                     headFreeModeHold = heading;
                 }
+            #endif
 #ifdef LCD_TELEMETRY_AUTO
             } else if (rcData[ROLL] < cfg.mincheck && rcData[PITCH] > cfg.maxcheck && armed == 0) {
                 if (rcDelayCommand == 20) {

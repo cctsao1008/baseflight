@@ -66,10 +66,23 @@ static void adxl345Read(int16_t *accelData)
 {
     static uint8_t buf[6];
 
+	#ifndef modify_it
+	if(i2cRead(ADXL345_ADDRESS, ADXL345_DATA_OUT, 6, buf) == true)
+	{
+        accelData[0] = buf[0] + (buf[1] << 8);
+        accelData[1] = buf[2] + (buf[3] << 8);
+        accelData[2] = buf[4] + (buf[5] << 8);
+	}
+	else
+	{
+	    LED1_TOGGLE
+	}
+	#else
     i2cRead(ADXL345_ADDRESS, ADXL345_DATA_OUT, 6, buf);
     accelData[0] = buf[0] + (buf[1] << 8);
     accelData[1] = buf[2] + (buf[3] << 8);
     accelData[2] = buf[4] + (buf[5] << 8);
+	#endif
 }
 
 static void adxl345Align(int16_t *accData)

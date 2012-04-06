@@ -250,8 +250,13 @@ bool pwmInit(drv_pwm_config_t *init)
     TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure = { 0, };
     TIM_OCInitTypeDef TIM_OCInitStructure = { 0, };
 
+	#ifndef modify_it
+	uint8_t i;
+	#else
     uint8_t i, val;
     uint16_t c;
+	#endif
+
     bool throttleCal = false;
 
     // Inputs

@@ -63,10 +63,12 @@ typedef struct sensor_t
 #define BARO_PIN    GPIO_Pin_13
 
 // Helpful macros
+// Red LED
 #define LED0_TOGGLE              digitalToggle(LED0_GPIO, LED0_PIN);
 #define LED0_OFF                 digitalHi(LED0_GPIO, LED0_PIN);
 #define LED0_ON                  digitalLo(LED0_GPIO, LED0_PIN);
 
+// Green LED
 #define LED1_TOGGLE              digitalToggle(LED1_GPIO, LED1_PIN);
 #define LED1_OFF                 digitalHi(LED1_GPIO, LED1_PIN);
 #define LED1_ON                  digitalLo(LED1_GPIO, LED1_PIN);
@@ -77,6 +79,7 @@ typedef struct sensor_t
 
 #define BARO_OFF                 digitalLo(BARO_GPIO, BARO_PIN);
 #define BARO_ON                  digitalHi(BARO_GPIO, BARO_PIN);
+
 
 #include "drv_system.h"         // timers, delays, etc
 #include "drv_adc.h"

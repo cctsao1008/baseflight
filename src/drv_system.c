@@ -101,6 +101,11 @@ void systemInit(void)
 
     // Configure the rest of the stuff
     adcInit();
+
+    #if !defined(modify_it) && defined(USE_ALL_IN_ONE_II)
+    delay(3000); // delay for All in ONE II power on stable
+    #endif
+        
     i2cInit(I2C2);
 
     // sleep for 100ms
