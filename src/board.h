@@ -1,5 +1,8 @@
 #pragma once
 
+// for roundf()
+#define __USE_C99_MATH
+
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -79,7 +82,6 @@ typedef struct sensor_t
 
 #define BARO_OFF                 digitalLo(BARO_GPIO, BARO_PIN);
 #define BARO_ON                  digitalHi(BARO_GPIO, BARO_PIN);
-
 
 #include "drv_system.h"         // timers, delays, etc
 #include "drv_adc.h"

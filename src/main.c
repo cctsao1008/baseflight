@@ -43,7 +43,7 @@ int main(void)
     GPIOB->BRR = 0x18; // set low 4 & 3
     GPIOB->CRL = 0x44433444; // PIN 4 & 3 Output 50MHz
 #endif
-    
+
     systemInit();
 
     readEEPROM();
@@ -83,7 +83,6 @@ int main(void)
 
     // drop out any sensors that don't seem to work, init all the others. halt if gyro is dead.
     sensorsAutodetect();
-   
     imuInit(); // Mag is initialized inside imuInit
 
     // Check battery type/voltage
