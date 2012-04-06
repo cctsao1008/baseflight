@@ -1,0 +1,4 @@
+--cpu Cortex-M3 ".\obj\cli.o" ".\obj\config.o" ".\obj\imu.o" ".\obj\main.o" ".\obj\mixer.o" ".\obj\mw.o" ".\obj\sensors.o" ".\obj\serial.o" ".\obj\gps.o" ".\obj\spektrum.o" ".\obj\drv_adc.o" ".\obj\drv_adxl345.o" ".\obj\drv_bmp085.o" ".\obj\drv_hmc5883l.o" ".\obj\drv_i2c.o" ".\obj\drv_mpu3050.o" ".\obj\drv_pwm.o" ".\obj\drv_system.o" ".\obj\drv_uart.o" ".\obj\drv_ledring.o" ".\obj\drv_mpu6050.o" ".\obj\core_cm3.o" ".\obj\system_stm32f10x.o" ".\obj\misc.o" ".\obj\stm32f10x_adc.o" ".\obj\stm32f10x_dma.o" ".\obj\stm32f10x_exti.o" ".\obj\stm32f10x_i2c.o" ".\obj\stm32f10x_rcc.o" ".\obj\stm32f10x_tim.o" ".\obj\stm32f10x_usart.o" ".\obj\stm32f10x_gpio.o" ".\obj\stm32f10x_flash.o" ".\obj\startup_stm32f10x_md.o" --library_type=microlib --strict --scatter ".\obj\baseflight.sct" 
+--summary_stderr --info summarysizes --map --xref --callgraph --symbols 
+--info sizes --info totals --info unused --info veneers 
+ --list ".\obj\baseflight.map" -o ".\obj\baseflight.axf"

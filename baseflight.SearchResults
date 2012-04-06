@@ -1,0 +1,240 @@
+---- rcData Matches (69 in 4 files) ----
+Mixer.c (src):                servo[0]  = PITCH_DIRECTION_L * (rcData[PITCH] - cfg.midrc) + ROLL_DIRECTION_L * (rcData[ROLL] - cfg.midrc);
+Mixer.c (src):                servo[1]  = PITCH_DIRECTION_R * (rcData[PITCH] - cfg.midrc) + ROLL_DIRECTION_R * (rcData[ROLL] - cfg.midrc);
+Mixer.c (src):        servo[0] = cfg.gimbal_pitch_mid + rcData[AUX3] - cfg.midrc;
+Mixer.c (src):        servo[1] = cfg.gimbal_roll_mid + rcData[AUX4] - cfg.midrc;
+Mixer.c (src):        if ((rcData[THROTTLE]) < cfg.mincheck) {
+Mw.c (src):int16_t rcData[8] = { 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500 };              // interval [1000;2000]
+Mw.c (src):    if (rcData[THROTTLE] < 1500) {
+Mw.c (src):    } else if (rcData[THROTTLE] < 2000) {
+Mw.c (src):        prop2 = 100 - (uint16_t) cfg.dynThrPID * (rcData[THROTTLE] - 1500) / 500;
+Mw.c (src):        uint16_t tmp = min(abs(rcData[axis] - cfg.midrc), 500);
+Mw.c (src):        if (rcData[axis] < cfg.midrc)
+Mw.c (src):    rcCommand[THROTTLE] = cfg.minthrottle + (int32_t)(cfg.maxthrottle - cfg.minthrottle) * (rcData[THROTTLE] - cfg.mincheck) / (2000 - cfg.mincheck);
+Mw.c (src):        if (rcDataMean[chan] < rcData[chan] - 3)
+Mw.c (src):            rcData[chan] = rcDataMean[chan] + 2;
+Mw.c (src):        if (rcDataMean[chan] > rcData[chan] + 3)
+Mw.c (src):            rcData[chan] = rcDataMean[chan] - 2;
+Mw.c (src):                rcData[i] = MIDRC;      // after specified guard time after RC signal is lost (in 0.1sec)
+Mw.c (src):            rcData[THROTTLE] = FAILSAVE_THR0TTLE;
+Mw.c (src):        if (rcData[THROTTLE] < cfg.mincheck) {
+Mw.c (src):            if (rcData[YAW] < cfg.mincheck && rcData[PITCH] < cfg.mincheck && armed == 0) {
+Mw.c (src):            } else if (rcData[YAW] > cfg.maxcheck && rcData[PITCH] > cfg.maxcheck && armed == 0) {
+Mw.c (src):            } else if (feature(FEATURE_INFLIGHT_ACC_CAL) && (armed == 0 && rcData[YAW] < cfg.mincheck && rcData[PITCH] > cfg.maxcheck && rcData[ROLL] > cfg.maxcheck)) {
+Mw.c (src):            } else if ((rcData[YAW] < cfg.mincheck || rcData[ROLL] < cfg.mincheck) && armed == 1) {
+Mw.c (src):            } else if ((rcData[YAW] > cfg.maxcheck || rcData[ROLL] > cfg.maxcheck) && rcData[PITCH] < cfg.maxcheck && armed == 0 && calibratingG == 0 && calibratedACC == 1) {
+Mw.c (src):            } else if (rcData[ROLL] < cfg.mincheck && rcData[PITCH] > cfg.maxcheck && armed == 0) {
+Mw.c (src):        } else if (rcData[THROTTLE] > cfg.maxcheck && armed == 0) {
+Mw.c (src):            if (rcData[YAW] < cfg.mincheck && rcData[PITCH] < cfg.mincheck) {   // throttle=max, yaw=left, pitch=min
+Mw.c (src):            } else if (rcData[YAW] > cfg.maxcheck && rcData[PITCH] < cfg.mincheck) {    // throttle=max, yaw=right, pitch=min
+Mw.c (src):            } else if (rcData[PITCH] > cfg.maxcheck) {
+Mw.c (src):            } else if (rcData[PITCH] < cfg.mincheck) {
+Mw.c (src):            } else if (rcData[ROLL] > cfg.maxcheck) {
+Mw.c (src):            } else if (rcData[ROLL] < cfg.mincheck) {
+Mw.c (src):            if (AccInflightCalibrationArmed && armed == 1 && rcData[THROTTLE] > cfg.mincheck && !rcOptions[BOXARM]) {   // Copter is airborne and you are turning it off via boxarm : start measurement
+Mw.c (src):            rcOptions[i] = (((rcData[AUX1] < 1300) | (1300 < rcData[AUX1] && rcData[AUX1] < 1700) << 1 | (rcData[AUX1] > 1700) << 2 | (rcData[AUX2] < 1300) << 3 | (1300 < rcData[AUX2] && rcData[AUX2] < 1700) << 4 | (rcData[AUX2] > 1700) << 5) & cfg.activate1[i])
+Mw.c (src):                || (((rcData[AUX3] < 1300) | (1300 < rcData[AUX3] && rcData[AUX3] < 1700) << 1 | (rcData[AUX3] > 1700) << 2 | (rcData[AUX4] < 1300) << 3 | (1300 < rcData[AUX4] && rcData[AUX4] < 1700) << 4 | (rcData[AUX4] > 1700) << 5) & cfg.activate2[i]);
+Mw.h (src):extern int16_t rcData[8];
+Serial.c (src):            rcData[THROTTLE] = (SerialRead(0) * 4) + 1000;
+Serial.c (src):            rcData[ROLL] = (SerialRead(0) * 4) + 1000;
+Serial.c (src):            rcData[PITCH] = (SerialRead(0) * 4) + 1000;
+Serial.c (src):            rcData[YAW] = (SerialRead(0) * 4) + 1000;
+Serial.c (src):            rcData[AUX1] = (SerialRead(0) * 4) + 1000;
+Serial.c (src):                serialize16(rcData[i]);
+Serial.c (src):                serialize16(rcData[i]);
+---- 1498 Matches (0 in 0 files) ----
+---- 1498 Search Errors Encountered (1) ----
+The following 1 files could not be processed:
+C:\baseflight\JLinkLog.txt : File could not be opened.
+---- rcData4Values Matches (3 in 1 files) ----
+Mw.c (src):    static int16_t rcData4Values[8][4], rcDataMean[8];
+Mw.c (src):        rcData4Values[chan][rc4ValuesIndex % 4] = rcReadRawFunc(chan);
+Mw.c (src):            rcDataMean[chan] += rcData4Values[chan][a];
+---- rcReadRawFunc Matches (5 in 2 files) ----
+Main.c (src):extern rcReadRawDataPtr rcReadRawFunc;
+Main.c (src):    rcReadRawFunc = pwmReadRawRC;
+Main.c (src):        rcReadRawFunc = spektrumReadRawRC;
+Mw.c (src):rcReadRawDataPtr rcReadRawFunc = NULL; // receive data from default (pwm/ppm) or additional (spek/sbus/?? receiver drivers)
+Mw.c (src):        rcData4Values[chan][rc4ValuesIndex % 4] = rcReadRawFunc(chan);
+---- motor_pwm_rate Matches (5 in 4 files) ----
+Cli.c (src):    { "motor_pwm_rate", VAR_UINT16, &cfg.motor_pwm_rate, 50, 498 },
+Config.c (src):    cfg.motor_pwm_rate = 400;
+Main.c (src):    pwm_params.motorPwmRate = cfg.motor_pwm_rate;
+Mw.h (src):    uint16_t motor_pwm_rate;                // The update rate of motor outputs (50-498Hz)
+---- motorPwmRate Matches (5 in 3 files) ----
+Drv_pwm.c (src):        TIM_TimeBaseStructure.TIM_Period = (1000000 / init->motorPwmRate) - 1;
+Drv_pwm.c (src):        TIM_TimeBaseStructure.TIM_Period = (1000000 / init->motorPwmRate) - 1;
+Drv_pwm.c (src):        TIM_TimeBaseStructure.TIM_Period = (1000000 / init->motorPwmRate) - 1;
+Drv_pwm.h (src):    uint16_t motorPwmRate;
+Main.c (src):    pwm_params.motorPwmRate = cfg.motor_pwm_rate;
+---- PWM_State Matches (2 in 1 files) ----
+Drv_pwm.c (src):static struct PWM_State {
+Drv_pwm.c (src):        struct PWM_State *state = &Inputs[i];
+---- Inputs Matches (9 in 3 files) ----
+Core_cm3.h (lib\cmsis\cm3\coresupport): * @brief  Inputs a character via variable ITM_RxBuffer
+Core_cm3.h (lib\cmsis\cm3\coresupport): * The function inputs a character via variable ITM_RxBuffer. 
+Drv_pwm.c (src):} Inputs[8] = { { 0, } };
+Drv_pwm.c (src):            Inputs[chan].capture = diff;
+Drv_pwm.c (src):        struct PWM_State *state = &Inputs[i];
+Drv_pwm.c (src):    // Inputs
+Drv_pwm.c (src):        Inputs[i].capture = 1500;
+Drv_pwm.c (src):    return Inputs[channel].capture;
+Main.c (src):    pwm_params.enableInput = !feature(FEATURE_SPEKTRUM); // disable inputs if using spektrum
+---- pwmInitializeInput Matches (13 in 2 files) ----
+Baseflight.htm (obj):<BR><BR>[Stack]<UL><LI>Max Depth = 116<LI>Call Chain = pwmInit &rArr; pwmInitializeInput &rArr; TIM_ICInit &rArr; TI1_Config
+Baseflight.htm (obj):<LI><a href="#[112]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pwmInitializeInput
+Baseflight.htm (obj):<BR>[Called By]<UL><LI><a href="#[112]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pwmInitializeInput
+Baseflight.htm (obj):<BR><BR>[Called By]<UL><LI><a href="#[112]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pwmInitializeInput
+Baseflight.htm (obj):<BR>[Called By]<UL><LI><a href="#[112]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pwmInitializeInput
+Baseflight.htm (obj):<BR><BR>[Called By]<UL><LI><a href="#[112]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pwmInitializeInput
+Baseflight.htm (obj):<BR><BR>[Called By]<UL><LI><a href="#[112]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pwmInitializeInput
+Baseflight.htm (obj):<BR>[Called By]<UL><LI><a href="#[112]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pwmInitializeInput
+Baseflight.htm (obj):<BR>[Called By]<UL><LI><a href="#[112]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pwmInitializeInput
+Baseflight.htm (obj):<P><STRONG><a name="[112]"></a>pwmInitializeInput</STRONG> (Thumb, 386 bytes, Stack size 32 bytes, drv_pwm.o(.text))
+Baseflight.htm (obj):<BR><BR>[Stack]<UL><LI>Max Depth = 68<LI>Call Chain = pwmInitializeInput &rArr; TIM_ICInit &rArr; TI1_Config
+Drv_pwm.c (src):static void pwmInitializeInput(bool usePPM)
+Drv_pwm.c (src):        pwmInitializeInput(usePPMFlag);
+---- numOutputChannels Matches (5 in 1 files) ----
+Drv_pwm.c (src):static uint8_t numOutputChannels = 0;
+Drv_pwm.c (src):        numOutputChannels = 10;
+Drv_pwm.c (src):        numOutputChannels = 6;
+Drv_pwm.c (src):    if (channel < numOutputChannels)
+Drv_pwm.c (src):    return numOutputChannels;
+---- pwmIRQHandler Matches (17 in 2 files) ----
+Baseflight.htm (obj):<BR><BR>[Stack]<UL><LI>Max Depth = 76<LI>Call Chain = TIM2_IRQHandler &rArr; pwmIRQHandler &rArr; TIM_ICInit &rArr; TI1_Config
+Baseflight.htm (obj):<LI><a href="#[109]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pwmIRQHandler
+Baseflight.htm (obj):<BR><BR>[Stack]<UL><LI>Max Depth = 76<LI>Call Chain = TIM3_IRQHandler &rArr; pwmIRQHandler &rArr; TIM_ICInit &rArr; TI1_Config
+Baseflight.htm (obj):<BR>[Calls]<UL><LI><a href="#[109]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pwmIRQHandler
+Baseflight.htm (obj):<LI><a href="#[109]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pwmIRQHandler
+Baseflight.htm (obj):<LI><a href="#[109]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pwmIRQHandler
+Baseflight.htm (obj):<BR><BR>[Called By]<UL><LI><a href="#[109]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pwmIRQHandler
+Baseflight.htm (obj):<BR><BR>[Called By]<UL><LI><a href="#[109]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pwmIRQHandler
+Baseflight.htm (obj):<BR><BR>[Called By]<UL><LI><a href="#[109]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pwmIRQHandler
+Baseflight.htm (obj):<LI><a href="#[109]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pwmIRQHandler
+Baseflight.htm (obj):<LI><a href="#[109]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;pwmIRQHandler
+Baseflight.htm (obj):<P><STRONG><a name="[109]"></a>pwmIRQHandler</STRONG> (Thumb, 232 bytes, Stack size 32 bytes, drv_pwm.o(.text))
+Baseflight.htm (obj):<BR><BR>[Stack]<UL><LI>Max Depth = 68<LI>Call Chain = pwmIRQHandler &rArr; TIM_ICInit &rArr; TI1_Config
+Drv_pwm.c (src):static void pwmIRQHandler(TIM_TypeDef *tim);
+Drv_pwm.c (src):        pwmIRQHandler(TIM2);
+Drv_pwm.c (src):    pwmIRQHandler(TIM3);
+Drv_pwm.c (src):static void pwmIRQHandler(TIM_TypeDef *tim)
+---- BMA180 Matches (1 in 1 files) ----
+Mw.h (src):/* should now be ok with BMA020 and BMA180 ACC */
+---- TRUSTED_ACCZ Matches (1 in 1 files) ----
+Mw.h (src):#define TRUSTED_ACCZ
+---- gps Matches (32 in 8 files) ----
+Baseflight.htm (obj): <LI><a href="#[39]">GPS_NewData</a> from gps.o(.text) referenced from gps.o(.text)
+Baseflight.htm (obj):<P><STRONG><a name="[9f]"></a>gpsInit</STRONG> (Thumb, 18 bytes, Stack size 8 bytes, gps.o(.text))
+Baseflight.htm (obj):<P><STRONG><a name="[d2]"></a>GPS_distance</STRONG> (Thumb, 138 bytes, Stack size 32 bytes, gps.o(.text))
+Baseflight.htm (obj):<P><STRONG><a name="[d7]"></a>grab_fields</STRONG> (Thumb, 64 bytes, Stack size 16 bytes, gps.o(.text))
+Baseflight.htm (obj):<P><STRONG><a name="[d6]"></a>GPS_coord_to_degrees</STRONG> (Thumb, 130 bytes, Stack size 16 bytes, gps.o(.text))
+Baseflight.htm (obj):<P><STRONG><a name="[d5]"></a>GPS_newFrame</STRONG> (Thumb, 382 bytes, Stack size 32 bytes, gps.o(.text))
+Baseflight.htm (obj):<P><STRONG><a name="[39]"></a>GPS_NewData</STRONG> (Thumb, 126 bytes, Stack size 24 bytes, gps.o(.text))
+Baseflight.htm (obj):<BR>[Address Reference Count : 1]<UL><LI> gps.o(.text)
+Baseflight.htm (obj):<P><STRONG><a name="[d8]"></a>hex_c</STRONG> (Thumb, 18 bytes, Stack size 0 bytes, gps.o(.text))
+Cli.c (src):    "SERVO_TILT", "CAMTRIG", "GYRO_SMOOTHING", "LED_RING", "GPS",
+Cli.c (src):    "ACC", "BARO", "MAG", "SONAR", "GPS", NULL
+Config.c (src):    // gps baud-rate
+Drv_uart.c (src):/* -------------------------- UART2 (Spektrum, GPS) ----------------------------- */
+Gps.c (src): * Multiwii GPS code
+Gps.c (src):/* this is an equirectangular approximation to calculate distance and bearing between 2 GPS points (lat/long)
+Gps.c (src):/* This is a light implementation of a GPS frame decoding
+Gps.c (src):   This should work with most of modern GPS devices configured to output NMEA frames.
+Gps.c (src):     - GPS fix is/is not ok
+Gps.c (src):     - GPS num sat (4 is enough to be +/- reliable)
+Gps.c (src):     - GPS altitude (for OSD displaying)
+Gps.c (src):     - GPS speed (for OSD displaying)
+Main.c (src):        // spektrum and GPS are mutually exclusive
+Main.c (src):        // Optional GPS - available only when using PPM, otherwise required pins won't be usable
+Mw.c (src):uint8_t GPSModeHome = 0;        // if GPS RTH is activated
+Mw.c (src):uint8_t GPSModeHold = 0;        // if GPS PH is activated
+Mw.c (src):// GPS
+Mw.c (src):uint8_t GPS_update = 0;         // it's a binary toogle to distinct a GPS position update
+Mw.c (src):int16_t GPS_angle[2];           // it's the angles that must be applied for GPS correction
+Mw.c (src):#if 0                           // GPS - not used as we read gps data in interrupt mode
+Mw.h (src):    // gps baud-rate
+Mw.h (src):// gps
+---- BOXACC Matches (2 in 2 files) ----
+Mw.c (src):        if ((rcOptions[BOXACC] || (failsafeCnt > 5 * FAILSAVE_DELAY)) && (sensors(SENSOR_ACC))) {
+Mw.h (src):#define BOXACC       0
+---- AUX1 Matches (7 in 4 files) ----
+Mixer.c (src):            } else {                    // use sensors to correct (gyro only or gyro+acc according to aux1/aux2 configuration
+Mw.c (src):            rcOptions[i] = (((rcData[AUX1] < 1300) | (1300 < rcData[AUX1] && rcData[AUX1] < 1700) << 1 | (rcData[AUX1] > 1700) << 2 | (rcData[AUX2] < 1300) << 3 | (1300 < rcData[AUX2] && rcData[AUX2] < 1700) << 4 | (rcData[AUX2] > 1700) << 5) & cfg.activate1[i])
+Mw.h (src):#define AUX1       4
+Serial.c (src):            rcData[AUX1] = (SerialRead(0) * 4) + 1000;
+---- errorAngleI Matches (8 in 1 files) ----
+Mw.c (src):    static int16_t errorAngleI[2] = { 0, 0 };
+Mw.c (src):            errorAngleI[ROLL] = 0;
+Mw.c (src):            errorAngleI[PITCH] = 0;
+Mw.c (src):                errorAngleI[ROLL] = 0;
+Mw.c (src):                errorAngleI[PITCH] = 0;
+Mw.c (src):            errorAngleI[axis] = constrain(errorAngleI[axis] + errorAngle, -10000, +10000);      // WindUp     // 16 bits is ok here
+Mw.c (src):            ITerm = ((int32_t)errorAngleI[axis] * cfg.I8[PIDLEVEL]) >> 12;     // 32 bits is needed for calculation:10000*I8 could exceed 32768   16 bits is ok for result
+---- armed Matches (27 in 5 files) ----
+Drv_ledring.c (src):    	if (armed)
+Mixer.c (src):        if (armed == 0)
+Mw.c (src):uint8_t armed = 0;
+Mw.c (src):        if (armed) {
+Mw.c (src):        if (failsafeCnt > (5 * FAILSAVE_DELAY) && armed == 1) { // Stabilize, and set Throttle to specified level
+Mw.c (src):                armed = 0;      //This will prevent the copter to automatically rearm if failsafe shuts it down and prevents
+Mw.c (src):            if (rcData[YAW] < cfg.mincheck && rcData[PITCH] < cfg.mincheck && armed == 0) {
+Mw.c (src):            } else if (rcData[YAW] > cfg.maxcheck && rcData[PITCH] > cfg.maxcheck && armed == 0) {
+Mw.c (src):            } else if (feature(FEATURE_INFLIGHT_ACC_CAL) && (armed == 0 && rcData[YAW] < cfg.mincheck && rcData[PITCH] > cfg.maxcheck && rcData[ROLL] > cfg.maxcheck)) {
+Mw.c (src):                    armed = 1;
+Mw.c (src):                } else if (armed)
+Mw.c (src):                    armed = 0;
+Mw.c (src):            } else if (rcData[YAW] < cfg.mincheck && armed == 1) {
+Mw.c (src):                    armed = 0;  // rcDelayCommand = 20 => 20x20ms = 0.4s = time to wait for a specific RC command to be acknowledged
+Mw.c (src):            } else if (rcData[YAW] > cfg.maxcheck && rcData[PITCH] < cfg.maxcheck && armed == 0 && calibratingG == 0 && calibratedACC == 1) {
+Mw.c (src):                    armed = 1;
+Mw.c (src):            } else if ((rcData[YAW] < cfg.mincheck || rcData[ROLL] < cfg.mincheck) && armed == 1) {
+Mw.c (src):                    armed = 0;  // rcDelayCommand = 20 => 20x20ms = 0.4s = time to wait for a specific RC command to be acknowledged
+Mw.c (src):            } else if ((rcData[YAW] > cfg.maxcheck || rcData[ROLL] > cfg.maxcheck) && rcData[PITCH] < cfg.maxcheck && armed == 0 && calibratingG == 0 && calibratedACC == 1) {
+Mw.c (src):                    armed = 1;
+Mw.c (src):            } else if (rcData[ROLL] < cfg.mincheck && rcData[PITCH] > cfg.maxcheck && armed == 0) {
+Mw.c (src):        } else if (rcData[THROTTLE] > cfg.maxcheck && armed == 0) {
+Mw.c (src):            if (AccInflightCalibrationArmed && armed == 1 && rcData[THROTTLE] > cfg.mincheck && !rcOptions[BOXARM]) {   // Copter is airborne and you are turning it off via boxarm : start measurement
+Mw.c (src):            } else if (AccInflightCalibrationMeasurementDone && armed == 0) {
+Mw.h (src):    uint16_t mincommand;                    // This is the value for the ESCs when they are not armed. In some cases, this value must be lowered down to 900 for some specific ESCs
+Mw.h (src):extern uint8_t armed;
+Serial.c (src):            serialize8(accMode | baroMode << 1 | magMode << 2 | GPSModeHome << 3 | GPSModeHold << 4 | armed << 5);
+---- exit Matches (15 in 7 files) ----
+Cli.c (src):// we unset this on 'exit'
+Cli.c (src):    { "exit", "", cliExit },
+Cli.c (src):        uartPrint("\r\nEntering CLI Mode, type 'exit' to return, or 'help'\r\n");
+Cli.c (src):            // 'exit' will reset this flag, so we don't need to print prompt again
+Loader.c (support\stmloader):			exit(0);
+Stm32f10x.h (lib\cmsis\cm3\devicesupport\st\stm32f10x):#define  SCB_SCR_SLEEPONEXIT                 ((uint8_t)0x02)               /*!< Sleep on exit bit */
+Stm32f10x_can.c (lib\stm32f10x_stdperiph_driver\src):  /* Exit from sleep mode */
+Stm32f10x_rcc.c (lib\stm32f10x_stdperiph_driver\src):  /* Wait till HSE is ready and if Time out is reached exit */
+Stm32f10x_rtc.c (lib\stm32f10x_stdperiph_driver\src):  /* Reset the CNF flag to exit from the Configuration Mode */
+System_stm32f10x.c (lib\cmsis\cm3\devicesupport\st\stm32f10x):  /* Wait till HSE is ready and if Time out is reached exit */
+System_stm32f10x.c (lib\cmsis\cm3\devicesupport\st\stm32f10x):  /* Wait till HSE is ready and if Time out is reached exit */
+System_stm32f10x.c (lib\cmsis\cm3\devicesupport\st\stm32f10x):  /* Wait till HSE is ready and if Time out is reached exit */
+System_stm32f10x.c (lib\cmsis\cm3\devicesupport\st\stm32f10x):  /* Wait till HSE is ready and if Time out is reached exit */
+System_stm32f10x.c (lib\cmsis\cm3\devicesupport\st\stm32f10x):  /* Wait till HSE is ready and if Time out is reached exit */
+System_stm32f10x.c (lib\cmsis\cm3\devicesupport\st\stm32f10x):  /* Wait till HSE is ready and if Time out is reached exit */
+---- systemReset Matches (9 in 5 files) ----
+Baseflight.htm (obj):<LI><a href="#[5c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;systemReset
+Baseflight.htm (obj):<P><STRONG><a name="[5c]"></a>systemReset</STRONG> (Thumb, 18 bytes, Stack size 0 bytes, drv_system.o(.text))
+Baseflight.htm (obj):<LI><a href="#[5c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;systemReset
+Baseflight.htm (obj):<LI><a href="#[5c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;systemReset
+Cli.c (src):    systemReset(false);
+Cli.c (src):    systemReset(false);
+Drv_system.c (src):void systemReset(bool toBootloader)
+Drv_system.h (src):void systemReset(bool toBootloader);
+Serial.c (src):            systemReset(true);
+---- deadband Matches (10 in 4 files) ----
+Cli.c (src):    { "deadband", VAR_UINT8, &cfg.deadband, 0, 32 },
+Config.c (src):    cfg.deadband = 5;
+Config.c (src):    cfg.deadband = 0;
+Mw.c (src):            if (cfg.deadband) {
+Mw.c (src):                if (tmp > cfg.deadband) {
+Mw.c (src):                    tmp -= cfg.deadband;
+Mw.h (src):    uint8_t deadband;                       // introduce a deadband around the stick center for pitch and roll axis. Must be greater than zero.
+Mw.h (src):    uint8_t yawdeadband;                    // introduce a deadband around the stick center for yaw axis. Must be greater than zero.
+---- lookupRX Matches (6 in 3 files) ----
+Config.c (src):        lookupRX[i] = (2500 + cfg.rcExpo8 * (i * i - 25)) * i * (int32_t) cfg.rcRate8 / 1250;
+Mw.c (src):int16_t lookupRX[7];            // lookup table for expo & RC rate
+Mw.c (src):            rcCommand[axis] = lookupRX[tmp2] + (tmp - tmp2 * 100) * (lookupRX[tmp2 + 1] - lookupRX[tmp2]) / 100;
+Mw.h (src):extern int16_t lookupRX[7];     //  lookup table for expo & RC rate
