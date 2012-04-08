@@ -21,9 +21,15 @@ sensor_t gyro;                  // gyro access functions
 
 void sensorsAutodetect(void)
 {
+    drv_adxl345_config_t acc_params;
+
+    // configure parameters for ADXL345 driver
+    acc_params.useFifo = false;
+    acc_params.dataRate = 800; // unused currently
+
     uartPrint("Sensor list : \r\n");
     // Detect what's available
-    if (!adxl345Detect(&acc))
+    if (!adxl345Detect(&acc_params, &acc))
         sensorsClear(SENSOR_ACC);
     else
         uartPrint("ADXL345\r\n");
@@ -84,7 +90,13 @@ void batteryInit(void)
             break;
     }
     batteryCellCount = i;
+
+    #if !defined(modify_it)
+    batteryWarningVoltage = 100; // 10.0 V for A123 Battery 4S
+    #else
     batteryWarningVoltage = i * cfg.vbatmincellvoltage; // 3.3V per cell minimum, configurable in CLI
+    #endif
+    
 }
 
 static void ACC_Common(void)

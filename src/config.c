@@ -33,10 +33,6 @@ void readEEPROM(void)
     // Read flash
     memcpy(&cfg, (char *)FLASH_WRITE_ADDR, sizeof(config_t));
 
-#if defined(POWERMETER)
-    pAlarm = (uint32_t) cfg.powerTrigger1 *(uint32_t) PLEVELSCALE *(uint32_t) PLEVELDIV;    // need to cast before multiplying
-#endif
-
     for (i = 0; i < 7; i++)
         lookupRX[i] = (2500 + cfg.rcExpo8 * (i * i - 25)) * i * (int32_t) cfg.rcRate8 / 1250;
 
@@ -122,15 +118,18 @@ void checkFirstTime(bool reset)
     }
     cfg.accTrim[0] = 0;
     cfg.accTrim[1] = 0;
+    cfg.accZero[0] = 0;
+    cfg.accZero[1] = 0;
+    cfg.accZero[2] = 0;
     cfg.acc_lpf_factor = 4;
     cfg.gyro_lpf = 42;
     cfg.gyro_smoothing_factor = 0x00141403; // default factors of 20, 20, 3 for R/P/Y
-    cfg.powerTrigger1 = 0;
     cfg.vbatscale = 110;
 
 	#ifndef modify_it
     cfg.vbatmaxcellvoltage = 36;
     cfg.vbatmincellvoltage = 20;
+    cfg.batteryWarningVoltage = 100;
 	#else
     cfg.vbatmaxcellvoltage = 43;
     cfg.vbatmincellvoltage = 33;
@@ -138,15 +137,8 @@ void checkFirstTime(bool reset)
 
     // Radio
     parseRcChannels("AETR1234");
-
-	#ifndef modify_it
-    cfg.deadband = 5;
-    cfg.yawdeadband = 5;
-	#else
     cfg.deadband = 0;
     cfg.yawdeadband = 0;
-	#endif
-	
     cfg.spektrum_hires = 0;
 
 	#ifndef modify_it
