@@ -23,9 +23,11 @@ void imuInit(void)
 {
     acc_25deg = acc_1G * 0.423f;
 
+#ifdef MAG
     // if mag sensor is enabled, use it
     if (sensors(SENSOR_MAG))
         Mag_init();
+#endif
 }
 
 void computeIMU(void)
@@ -127,7 +129,10 @@ void computeIMU(void)
 
 #define INV_GYR_CMPF_FACTOR   (1.0f / (GYR_CMPF_FACTOR  + 1.0f))
 #define INV_GYR_CMPFM_FACTOR  (1.0f / (GYR_CMPFM_FACTOR + 1.0f))
-#define GYRO_SCALE ((2380 * M_PI)/((32767.0f / 4.0f ) * 180.0f * 1000000.0f))     //should be 2279.44 but 2380 gives better result
+
+#define GYRO_SCALE ((1998 * M_PI)/((32767.0f / 4.0f ) * 180.0f * 1000000.0f))     // 32767 / 16.4lsb/dps for MPU3000
+
+// #define GYRO_SCALE ((2380 * M_PI)/((32767.0f / 4.0f ) * 180.0f * 1000000.0f))     //should be 2279.44 but 2380 gives better result (ITG-3200)
   // +-2000/sec deg scale
   //#define GYRO_SCALE ((200.0f * PI)/((32768.0f / 5.0f / 4.0f ) * 180.0f * 1000000.0f) * 1.5f)     
   // +- 200/sec deg scale
@@ -230,12 +235,15 @@ static void getEstimatedAttitude(void)
     angle[ROLL] = _atan2f(EstG.V.X, EstG.V.Z);
     angle[PITCH] = _atan2f(EstG.V.Y, EstG.V.Z);
 
+#ifdef MAG
     if (sensors(SENSOR_MAG)) {
         // Attitude of the cross product vector GxM
         heading = _atan2f(EstG.V.X * EstM.V.Z - EstG.V.Z * EstM.V.X, EstG.V.Z * EstM.V.Y - EstG.V.Y * EstM.V.Z) / 10;
     }
+#endif
 }
 
+#ifdef BARO
 #define UPDATE_INTERVAL 25000   // 40hz update rate (20hz LPF on acc)
 #define INIT_DELAY      4000000 // 4 sec initialization delay
 #define BARO_TAB_SIZE   40
@@ -288,3 +296,4 @@ void getEstimatedAltitude(void)
     temp32 = errorAltitudeI / 500; // I in range +/-60
     BaroPID += temp32;
 }
+#endif /* BARO */
