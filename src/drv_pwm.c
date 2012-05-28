@@ -1,13 +1,13 @@
 #include "board.h"
 
 #define PULSE_1MS       (1000) // 1ms pulse width
-// #define PULSE_PERIOD    (2500) // pulse period (400Hz)
-// #define PULSE_PERIOD_SERVO_DIGITAL  (5000) // pulse period for digital servo (200Hz)
-// #define PULSE_PERIOD_SERVO_ANALOG  (20000) // pulse period for analog servo (50Hz)
 
 // Forward declaration
 static void pwmIRQHandler(TIM_TypeDef *tim);
 static void ppmIRQHandler(TIM_TypeDef *tim);
+
+// external vars (ugh)
+extern int16_t failsafeCnt;
 
 // local vars
 static struct TIM_Channel {
@@ -92,6 +92,7 @@ static void ppmIRQHandler(TIM_TypeDef *tim)
             Inputs[chan].capture = diff;
         }
         chan++;
+        failsafeCnt = 0;
     }
 }
 
@@ -145,6 +146,8 @@ static void pwmIRQHandler(TIM_TypeDef *tim)
 
                 // switch state
                 state->state = 0;
+                // reset failsafe
+                failsafeCnt = 0;
 
                 TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;
                 TIM_ICInitStructure.TIM_Channel = channel.channel;
@@ -250,12 +253,12 @@ bool pwmInit(drv_pwm_config_t *init)
     TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure = { 0, };
     TIM_OCInitTypeDef TIM_OCInitStructure = { 0, };
 
-	#ifndef modify_it
-	uint8_t i;
-	#else
+    #ifndef NO_CCTSAO_CODE
+    uint8_t i;
+    #else
     uint8_t i, val;
     uint16_t c;
-	#endif
+    #endif
 
     bool throttleCal = false;
 
@@ -344,11 +347,18 @@ bool pwmInit(drv_pwm_config_t *init)
     // PWM1,2
     TIM_OC1Init(TIM1, &TIM_OCInitStructure);
     TIM_OC4Init(TIM1, &TIM_OCInitStructure);
+    TIM_OC1PreloadConfig(TIM1, TIM_OCPreload_Enable);
+    TIM_OC4PreloadConfig(TIM1, TIM_OCPreload_Enable);
+
     // PWM3,4,5,6
     TIM_OC1Init(TIM4, &TIM_OCInitStructure);
     TIM_OC2Init(TIM4, &TIM_OCInitStructure);
     TIM_OC3Init(TIM4, &TIM_OCInitStructure);
     TIM_OC4Init(TIM4, &TIM_OCInitStructure);
+    TIM_OC1PreloadConfig(TIM4, TIM_OCPreload_Enable);
+    TIM_OC2PreloadConfig(TIM4, TIM_OCPreload_Enable);
+    TIM_OC3PreloadConfig(TIM4, TIM_OCPreload_Enable);
+    TIM_OC4PreloadConfig(TIM4, TIM_OCPreload_Enable);
 
     TIM_Cmd(TIM1, ENABLE);
     TIM_Cmd(TIM4, ENABLE);
@@ -379,9 +389,15 @@ bool pwmInit(drv_pwm_config_t *init)
         TIM_OC2Init(TIM3, &TIM_OCInitStructure);
         TIM_OC3Init(TIM3, &TIM_OCInitStructure);
         TIM_OC4Init(TIM3, &TIM_OCInitStructure);
+        TIM_OC1PreloadConfig(TIM3, TIM_OCPreload_Enable);
+        TIM_OC2PreloadConfig(TIM3, TIM_OCPreload_Enable);
+        TIM_OC3PreloadConfig(TIM3, TIM_OCPreload_Enable);
+        TIM_OC4PreloadConfig(TIM3, TIM_OCPreload_Enable);
 
         TIM_Cmd(TIM3, ENABLE);
         TIM_CtrlPWMOutputs(TIM3, ENABLE);
+        // configure number of PWM outputs, in PPM/spektrum mode, we use bottom 4 channels more more motors
+        numOutputChannels = 10;
     }
 
 #if 0    

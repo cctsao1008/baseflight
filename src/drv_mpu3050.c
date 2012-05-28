@@ -107,7 +107,9 @@ static void mpu3050Read(int16_t *gyroData)
     gyroData[2] = (buf[4] << 8) | buf[5];
 }
 
-#if defined(modify_it)
+#ifndef NO_CCTSAO_CODE
+;
+#else
 static int16_t mpu3050ReadTemp(void)
 {
     uint8_t buf[2];

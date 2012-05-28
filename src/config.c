@@ -13,7 +13,7 @@ config_t cfg;
 const char rcChannelLetters[] = "AERT1234";
 
 static uint32_t enabledSensors = 0;
-static uint8_t checkNewConf = 16;
+uint8_t checkNewConf = 17;
 
 void parseRcChannels(const char *input)
 {
@@ -33,15 +33,26 @@ void readEEPROM(void)
     // Read flash
     memcpy(&cfg, (char *)FLASH_WRITE_ADDR, sizeof(config_t));
 
-    for (i = 0; i < 7; i++)
-        lookupRX[i] = (2500 + cfg.rcExpo8 * (i * i - 25)) * i * (int32_t) cfg.rcRate8 / 1250;
+    for(i = 0; i < 6; i++)
+        lookupPitchRollRC[i] = (2500 + cfg.rcExpo8 * (i * i - 25)) * i * (int32_t)cfg.rcRate8 / 2500;
+
+    for(i = 0; i < 11; i++) {
+        int16_t tmp = 10 * i - cfg.thrMid8;
+        uint8_t y = 1;
+        if (tmp > 0) 
+            y = 100 - cfg.thrMid8;
+        if (tmp < 0)
+            y = cfg.thrMid8;
+        lookupThrottleRC[i] = 10 * cfg.thrMid8 + tmp * (100 - cfg.thrExpo8 + (int32_t)cfg.thrExpo8 * (tmp * tmp) / (y * y) ) / 10;     // [0;1000]
+        lookupThrottleRC[i] = cfg.minthrottle + (int32_t)(cfg.maxthrottle - cfg.minthrottle)* lookupThrottleRC[i] / 1000; // [0;1000] -> [MINTHROTTLE;MAXTHROTTLE]
+    }
 
     cfg.wing_left_mid = constrain(cfg.wing_left_mid, WING_LEFT_MIN, WING_LEFT_MAX);     //LEFT 
     cfg.wing_right_mid = constrain(cfg.wing_right_mid, WING_RIGHT_MIN, WING_RIGHT_MAX); //RIGHT
-    cfg.tri_yaw_middle = constrain(cfg.tri_yaw_middle, TRI_YAW_CONSTRAINT_MIN, TRI_YAW_CONSTRAINT_MAX); //REAR
+    cfg.tri_yaw_middle = constrain(cfg.tri_yaw_middle, cfg.tri_yaw_min, cfg.tri_yaw_max); //REAR
 }
 
-void writeParams(void)
+void writeParams(uint8_t b)
 {
     FLASH_Status status;
     uint32_t i;
@@ -61,7 +72,8 @@ void writeParams(void)
     FLASH_Lock();
 
     readEEPROM();
-    blinkLED(15, 20, 1);
+    if (b)
+        blinkLED(15, 20, 1);
 }
 
 void checkFirstTime(bool reset)
@@ -76,12 +88,12 @@ void checkFirstTime(bool reset)
     // Default settings
     cfg.version = checkNewConf;
 
-	#ifdef modify_it
-	cfg.mixerConfiguration = MULTITYPE_HEX6X;
-	#else
+    #ifndef NO_CCTSAO_CODE
+    cfg.mixerConfiguration = MULTITYPE_HEX6X;
+    #else
     cfg.mixerConfiguration = MULTITYPE_QUADX;
-	#endif
-	
+    #endif
+    
     featureClearAll();
     featureSet(FEATURE_VBAT); // | FEATURE_PPM); // sadly, this is for hackers only
 
@@ -92,7 +104,7 @@ void checkFirstTime(bool reset)
     cfg.I8[PITCH] = 30;
     cfg.D8[PITCH] = 23;
     cfg.P8[YAW] = 85;
-    cfg.I8[YAW] = 0;
+    cfg.I8[YAW] = 45;
     cfg.D8[YAW] = 0;
     cfg.P8[PIDALT] = 16;
     cfg.I8[PIDALT] = 15;
@@ -103,37 +115,39 @@ void checkFirstTime(bool reset)
     cfg.P8[PIDVEL] = 0;
     cfg.I8[PIDVEL] = 0;
     cfg.D8[PIDVEL] = 0;
-    cfg.P8[PIDLEVEL] = 90;
-    cfg.I8[PIDLEVEL] = 45;
-    cfg.D8[PIDLEVEL] = 100;
+    cfg.P8[PIDLEVEL] = 70;
+    cfg.I8[PIDLEVEL] = 10;
+    cfg.D8[PIDLEVEL] = 20;
     cfg.P8[PIDMAG] = 40;
-    cfg.rcRate8 = 45;               // = 0.9 in GUI
+    cfg.rcRate8 = 90;
     cfg.rcExpo8 = 65;
     cfg.rollPitchRate = 0;
     cfg.yawRate = 0;
     cfg.dynThrPID = 0;
-    for (i = 0; i < CHECKBOXITEMS; i++) {
-        cfg.activate1[i] = 0;
-        cfg.activate2[i] = 0;
-    }
+    cfg.thrMid8 = 50;
+    cfg.thrExpo8 = 0;
+    for (i = 0; i < CHECKBOXITEMS; i++)
+        cfg.activate[i] = 0;
     cfg.accTrim[0] = 0;
     cfg.accTrim[1] = 0;
     cfg.accZero[0] = 0;
     cfg.accZero[1] = 0;
     cfg.accZero[2] = 0;
-    cfg.acc_lpf_factor = 4;
+    cfg.mag_declination = 0; // For example, -6deg 37min, = -637 Japan, format is [sign]dddmm (degreesminutes) default is zero.
+    cfg.acc_lpf_factor = 100;
     cfg.gyro_lpf = 42;
     cfg.gyro_smoothing_factor = 0x00141403; // default factors of 20, 20, 3 for R/P/Y
     cfg.vbatscale = 110;
 
-	#ifndef modify_it
+    #ifndef NO_CCTSAO_CODE
     cfg.vbatmaxcellvoltage = 36;
     cfg.vbatmincellvoltage = 20;
-    cfg.batteryWarningVoltage = 100;
-	#else
+    //cfg.batteryWarningVoltage = 100;
+    cfg.batteryWarningVoltage = 40;
+    #else
     cfg.vbatmaxcellvoltage = 43;
     cfg.vbatmincellvoltage = 33;
-	#endif
+    #endif
 
     // Radio
     parseRcChannels("AETR1234");
@@ -141,15 +155,20 @@ void checkFirstTime(bool reset)
     cfg.yawdeadband = 0;
     cfg.spektrum_hires = 0;
 
-	#ifndef modify_it
+    #ifndef NO_CCTSAO_CODE
     cfg.midrc = 1520;
     cfg.mincheck = 1110;
     cfg.maxcheck = 1930;
-	#else
+    #else
     cfg.midrc = 1500;
     cfg.mincheck = 1100;
     cfg.maxcheck = 1900;
-	#endif
+    #endif
+
+    // Failsafe Variables
+    cfg.failsafe_delay = 10; // 1sec
+    cfg.failsafe_off_delay = 200; // 20sec
+    cfg.failsafe_throttle = 1200; // decent default which should always be below hover throttle for people.
 
     // Motor/ESC/Servo
     cfg.minthrottle = 1150;
@@ -169,6 +188,7 @@ void checkFirstTime(bool reset)
     // gimbal
     cfg.gimbal_pitch_gain = 10;
     cfg.gimbal_roll_gain = 10;
+    cfg.gimbal_flags = GIMBAL_NORMAL;
     cfg.gimbal_pitch_min = 1020;
     cfg.gimbal_pitch_max = 2000;
     cfg.gimbal_pitch_mid = 1500;
@@ -182,7 +202,7 @@ void checkFirstTime(bool reset)
     // serial(uart1) baudrate
     cfg.serial_baudrate = 115200;
 
-    writeParams();
+    writeParams(0);
 }
 
 bool sensors(uint32_t mask)

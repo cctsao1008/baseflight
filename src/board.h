@@ -36,7 +36,8 @@ typedef enum {
     FEATURE_CAMTRIG = 1 << 6,
     FEATURE_GYRO_SMOOTHING = 1 << 7,
     FEATURE_LED_RING = 1 << 8,
-    FEATURE_GPS = 1 << 9
+    FEATURE_GPS = 1 << 9,
+    FEATURE_FAILSAFE = 1 << 10
 } AvailableFeatures;
 
 typedef void (* sensorInitFuncPtr)(void);                   // sensor init prototype
@@ -124,6 +125,7 @@ typedef struct sensor_t
 #include "drv_hmc5883l.h"
 #include "drv_i2c.h"
 #include "drv_ledring.h"
+#include "drv_mma845x.h"
 #include "drv_mpu3050.h"
 #include "drv_mpu6050.h"
 #include "drv_pwm.h"

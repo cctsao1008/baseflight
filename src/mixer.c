@@ -120,7 +120,7 @@ void mixTable(void)
             motor[0] = PIDMIX(0, +4 / 3, 0);    //REAR
             motor[1] = PIDMIX(-1, -2 / 3, 0);   //RIGHT
             motor[2] = PIDMIX(+1, -2 / 3, 0);   //LEFT
-            servo[4] = constrain(cfg.tri_yaw_middle + cfg.yaw_direction * axisPID[YAW], TRI_YAW_CONSTRAINT_MIN, TRI_YAW_CONSTRAINT_MAX); //REAR
+            servo[4] = constrain(cfg.tri_yaw_middle + cfg.yaw_direction * axisPID[YAW], cfg.tri_yaw_min, cfg.tri_yaw_max); //REAR
             break;
 
         case MULTITYPE_QUADP:
@@ -205,10 +205,10 @@ void mixTable(void)
             break;
 
         case MULTITYPE_VTAIL4:
-            motor[0] = PIDMIX(+0, +1, -1 / 2);      //REAR_R 
-            motor[1] = PIDMIX(-1, -1, +2 / 10); //FRONT_R 
-            motor[2] = PIDMIX(+0, +1, +1 / 2);      //REAR_L 
-            motor[3] = PIDMIX(+1, -1, -2 / 10); //FRONT_L
+            motor[0] = PIDMIX(+0, +1, -1 / 2);  //REAR_R 
+            motor[1] = PIDMIX(-1, -1, +0);      //FRONT_R 
+            motor[2] = PIDMIX(+0, +1, +1 / 2);  //REAR_L 
+            motor[3] = PIDMIX(+1, -1, -0);      //FRONT_L
             break;
 
         case MULTITYPE_GIMBAL:
@@ -232,8 +232,15 @@ void mixTable(void)
 
     // do camstab
     if (feature(FEATURE_SERVO_TILT)) {
-        servo[0] = cfg.gimbal_pitch_mid + rcData[AUX3] - cfg.midrc;
-        servo[1] = cfg.gimbal_roll_mid + rcData[AUX4] - cfg.midrc;
+        uint16_t aux[2] = { 0, 0 };
+
+        if ((cfg.gimbal_flags & GIMBAL_NORMAL) || (cfg.gimbal_flags & GIMBAL_TILTONLY))
+            aux[0] = rcData[AUX3] - cfg.midrc;
+        if (!(cfg.gimbal_flags & GIMBAL_DISABLEAUX34))
+            aux[1] = rcData[AUX4] - cfg.midrc;
+
+        servo[0] = cfg.gimbal_pitch_mid + aux[0];
+        servo[1] = cfg.gimbal_roll_mid + aux[1];
 
         if (rcOptions[BOXCAMSTAB]) {
             servo[0] += cfg.gimbal_pitch_gain * angle[PITCH] / 16;

@@ -16,6 +16,7 @@ static void cliVersion(char *cmdline);
 
 // from sensors.c
 extern uint8_t batteryCellCount;
+extern uint8_t accHardware;
 
 // from config.c RC Channel mapping
 extern const char rcChannelLetters[];
@@ -36,12 +37,18 @@ const char *mixerNames[] = {
 const char *featureNames[] = {
     "PPM", "VBAT", "INFLIGHT_ACC_CAL", "SPEKTRUM", "MOTOR_STOP",
     "SERVO_TILT", "CAMTRIG", "GYRO_SMOOTHING", "LED_RING", "GPS",
+    "FAILSAFE",
     NULL
 };
 
 // sync this with AvailableSensors enum from board.h
 const char *sensorNames[] = {
     "ACC", "BARO", "MAG", "SONAR", "GPS", NULL
+};
+
+// 
+const char *accNames[] = {
+    "ADXL345", "MPU6050", "MMA845x", NULL
 };
 
 typedef struct {
@@ -90,23 +97,25 @@ const clivalue_t valueTable[] = {
     { "mincommand", VAR_UINT16, &cfg.mincommand, 0, 2000 },
     { "mincheck", VAR_UINT16, &cfg.mincheck, 0, 2000 },
     { "maxcheck", VAR_UINT16, &cfg.maxcheck, 0, 2000 },
+    { "failsafe_delay", VAR_UINT8, &cfg.failsafe_delay, 0, 200 },
+    { "failsafe_off_delay", VAR_UINT8, &cfg.failsafe_off_delay, 0, 200 },
+    { "failsafe_throttle", VAR_UINT16, &cfg.failsafe_throttle, 1000, 2000 },
     { "motor_pwm_rate", VAR_UINT16, &cfg.motor_pwm_rate, 50, 498 },
     { "servo_pwm_rate", VAR_UINT16, &cfg.servo_pwm_rate, 50, 498 },
     { "spektrum_hires", VAR_UINT8, &cfg.spektrum_hires, 0, 1 },
     { "vbatscale", VAR_UINT8, &cfg.vbatscale, 10, 200 },
     { "vbatmaxcellvoltage", VAR_UINT8, &cfg.vbatmaxcellvoltage, 10, 50 },
     { "vbatmincellvoltage", VAR_UINT8, &cfg.vbatmincellvoltage, 10, 50 },
-    
-    #if !defined(modify_it)
+    #ifndef NO_CCTSAO_CODE
     { "batteryWarningVoltage", VAR_UINT8, &cfg.batteryWarningVoltage, 4, 200 },
     #endif
-    
     { "yaw_direction", VAR_INT8, &cfg.yaw_direction, -1, 1 },
     { "wing_left_mid", VAR_UINT16, &cfg.wing_left_mid, 0, 2000 },
     { "wing_right_mid", VAR_UINT16, &cfg.wing_right_mid, 0, 2000 },
     { "tri_yaw_middle", VAR_UINT16, &cfg.tri_yaw_middle, 0, 2000 },
     { "tri_yaw_min", VAR_UINT16, &cfg.tri_yaw_min, 0, 2000 },
     { "tri_yaw_max", VAR_UINT16, &cfg.tri_yaw_max, 0, 2000 },
+    { "gimbal_flags", VAR_UINT8, &cfg.gimbal_flags, 0, 255},
     { "gimbal_pitch_gain", VAR_INT8, &cfg.gimbal_pitch_gain, -100, 100 },
     { "gimbal_roll_gain", VAR_INT8, &cfg.gimbal_roll_gain, -100, 100 },
     { "gimbal_pitch_min", VAR_UINT16, &cfg.gimbal_pitch_min, 100, 3000 },
@@ -117,6 +126,7 @@ const clivalue_t valueTable[] = {
     { "gimbal_roll_mid", VAR_UINT16, &cfg.gimbal_roll_mid, 100, 3000 },
     { "acc_lpf_factor", VAR_UINT8, &cfg.acc_lpf_factor, 0, 250 },
     { "gyro_lpf", VAR_UINT16, &cfg.gyro_lpf, 0, 256 },
+    { "mag_declination", VAR_INT16, &cfg.mag_declination, -18000, 18000 },
     { "gps_baudrate", VAR_UINT32, &cfg.gps_baudrate, 1200, 115200 },
     { "serial_baudrate", VAR_UINT32, &cfg.serial_baudrate, 1200, 115200 },
     { "p_pitch", VAR_UINT8, &cfg.P8[PITCH], 0, 200},
@@ -350,7 +360,7 @@ static void cliMixer(char *cmdline)
 static void cliSave(char *cmdline)
 {
     uartPrint("Saving...");
-    writeParams();
+    writeParams(0);
     uartPrint("\r\nRebooting...");
     delay(10);
     systemReset(false);
@@ -425,7 +435,7 @@ static void cliSet(char *cmdline)
             uartPrint("\r\n");
             while (!uartTransmitEmpty());
         }
-    #ifndef modify_it
+    #ifndef NO_CCTSAO_CODE
     } else if ((eqptr == strstr(cmdline, "="))) {
     #else
     } else if ((eqptr = strstr(cmdline, "="))) {
@@ -480,6 +490,10 @@ static void cliStatus(char *cmdline)
             uartPrint((char *)sensorNames[i]);
         uartWrite(' ');
     }
+    if (sensors(SENSOR_ACC)) {
+        uartPrint("ACCHW: ");
+        uartPrint((char *)accNames[accHardware]);
+    }
     uartPrint("\r\n");
 
     uartPrint("Cycle Time: ");
@@ -493,7 +507,7 @@ static void cliStatus(char *cmdline)
 
 static void cliVersion(char *cmdline)
 {
-    uartPrint("Afro32 CLI version 2.0-pre3 " __DATE__ " / " __TIME__);
+    uartPrint("Afro32 CLI version 2.0 " __DATE__ " / " __TIME__);
 }
 
 void cliProcess(void)

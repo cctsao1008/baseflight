@@ -5,7 +5,7 @@ uint8_t calibratedACC = 0;
 uint16_t calibratingA = 0;       // the calibration is done is the main loop. Calibrating decreases at each cycle down to 0, then we enter in a normal mode.
 uint16_t calibratingG = 0;
 uint8_t calibratingM = 0;
-uint16_t acc_1G = 256;         // this is the 1G measured acceleration
+uint16_t acc_1G = 256;         // this is the 1G measured acceleration.
 int16_t heading, magHold;
 
 extern uint16_t InflightcalibratingA;
@@ -15,9 +15,11 @@ extern uint16_t AccInflightCalibrationSavetoEEProm;
 extern uint16_t AccInflightCalibrationActive;
 extern uint16_t batteryWarningVoltage;
 extern uint8_t batteryCellCount;
+extern float magneticDeclination;
 
 sensor_t acc;                   // acc access functions
 sensor_t gyro;                  // gyro access functions
+uint8_t accHardware = 0;        // which accel chip is used.
 
 #ifdef FY90Q
 // FY90Q analog gyro/acc
@@ -29,6 +31,8 @@ void sensorsAutodetect(void)
 // AfroFlight32 i2c sensors
 void sensorsAutodetect(void)
 {
+    int16_t deg, min;
+
     drv_adxl345_config_t acc_params;
 
     // configure parameters for ADXL345 driver
@@ -53,8 +57,10 @@ void sensorsAutodetect(void)
         uartPrint("HMC5883L\r\n");
 
     // Init sensors
-    if (sensors(SENSOR_ACC))
+    if (sensors(SENSOR_ACC)) {
         acc.init();
+        accHardware = ADXL345;
+    }
     if (sensors(SENSOR_BARO))
         bmp085Init();
 
@@ -62,14 +68,28 @@ void sensorsAutodetect(void)
     if (mpu6050Detect(&acc, &gyro)) { // first, try MPU6050, and re-enable acc (if ADXL345 is missing) since this chip has it built in
         sensorsSet(SENSOR_ACC);
         acc.init();
+        accHardware = MPU6050;
     } else if (!mpu3050Detect(&gyro)) {
         // if this fails, we get a beep + blink pattern. we're doomed, no gyro or i2c error.
         failureMode(3);
     }
+
+    // Try to init MMA8452
+    if (mma8452Detect(&acc)) {
+        sensorsSet(SENSOR_ACC);
+        acc.init();
+        accHardware = MMA845x;
+    }
+
     // this is safe because either mpu6050 or mpu3050 sets it, and in case of fail, none do.
     gyro.init();
     // todo: this is driver specific :(
     mpu3050Config(cfg.gyro_lpf);
+
+    // calculate magnetic declination
+    deg = cfg.mag_declination / 100;
+    min = cfg.mag_declination % 100;
+    magneticDeclination = deg + ((float)min * (1.0f / 60.0f));
 }
 #endif
 
@@ -100,12 +120,12 @@ void batteryInit(void)
     }
     batteryCellCount = i;
 
-    #if !defined(modify_it)
-    batteryWarningVoltage = 100; // 10.0 V for A123 Battery 4S
+    #if !defined(NO_CCTSAO_CODE)
+    batteryWarningVoltage = cfg.batteryWarningVoltage;
     #else
     batteryWarningVoltage = i * cfg.vbatmincellvoltage; // 3.3V per cell minimum, configurable in CLI
     #endif
-    
+
 }
 
 static void ACC_Common(void)
@@ -131,7 +151,7 @@ static void ACC_Common(void)
             cfg.accZero[YAW] = a[YAW] / 400 - acc_1G;       // for nunchuk 200=1G
             cfg.accTrim[ROLL] = 0;
             cfg.accTrim[PITCH] = 0;
-            writeParams();      // write accZero in EEPROM
+            writeParams(1);      // write accZero in EEPROM
         }
         calibratingA--;
     }
@@ -164,7 +184,7 @@ static void ACC_Common(void)
             if (InflightcalibratingA == 1) {
                 AccInflightCalibrationActive = 0;
                 AccInflightCalibrationMeasurementDone = 1;
-                blinkLED(10, 10, 2);        //buzzer for indicatiing the start inflight
+                toggleBeep = 2;      //buzzer for indicatiing the end of calibration
                 // recover saved values to maintain current flight behavior until new values are transferred
                 cfg.accZero[ROLL] = accZero_saved[ROLL];
                 cfg.accZero[PITCH] = accZero_saved[PITCH];
@@ -182,7 +202,7 @@ static void ACC_Common(void)
             cfg.accZero[YAW] = b[YAW] / 50 - acc_1G;    // for nunchuk 200=1G
             cfg.accTrim[ROLL] = 0;
             cfg.accTrim[PITCH] = 0;
-            writeParams();          // write accZero in EEPROM
+            writeParams(1);          // write accZero in EEPROM
         }
     }
 
@@ -321,15 +341,59 @@ static void Mag_getRawADC(void)
 
 void Mag_init(void)
 {
+    uint8_t numAttempts = 0, good_count = 0;
+    bool success = false;
+    uint8_t calibration_gain = 0x60; // HMC5883
+    uint16_t expected_x = 766;       // default values for HMC5883
+    uint16_t expected_yz = 713;
+    float gain_multiple = 660.0f / 1090.0f; // adjustment for runtime vs calibration gain
+    float cal[3];
+
     // initial calibration
     hmc5883lInit();
-    delay(100);
-    Mag_getRawADC();
-    delay(10);
 
+    magCal[0] = 0;
+    magCal[1] = 0;
+    magCal[2] = 0;
+
+    while (success == false && numAttempts < 20 && good_count < 5) {
+        // record number of attempts at initialisation
+        numAttempts++;
+        // enter calibration mode
+        hmc5883lCal(calibration_gain);
+        delay(100);
+        Mag_getRawADC();
+        delay(10);
+
+        cal[0] = fabsf(expected_x / (float)magADC[ROLL]);
+        cal[1] = fabsf(expected_yz / (float)magADC[PITCH]);
+        cal[2] = fabsf(expected_yz / (float)magADC[ROLL]);
+
+        if (cal[0] > 0.7f && cal[0] < 1.3f && cal[1] > 0.7f && cal[1] < 1.3f && cal[2] > 0.7f && cal[2] < 1.3f) {
+            good_count++;
+            magCal[0] += cal[0];
+            magCal[1] += cal[1];
+            magCal[2] += cal[2];
+        }
+    }
+
+    if (good_count >= 5) {
+        magCal[0] = magCal[0] * gain_multiple / (float)good_count;
+        magCal[1] = magCal[1] * gain_multiple / (float)good_count;
+        magCal[2] = magCal[2] * gain_multiple / (float)good_count;
+        success = true;
+    } else {
+        /* best guess */
+        magCal[0] = 1.0f;
+        magCal[1] = 1.0f;
+        magCal[2] = 1.0f;
+    }
+
+#if 0
     magCal[ROLL] = 1160.0f / abs(magADC[ROLL]);
     magCal[PITCH] = 1160.0f / abs(magADC[PITCH]);
     magCal[YAW] = 1080.0f / abs(magADC[YAW]);
+#endif
 
     hmc5883lFinishCal();
     magInit = 1;
@@ -381,8 +445,8 @@ void Mag_getADC(void)
         } else {
             tCal = 0;
             for (axis = 0; axis < 3; axis++)
-                cfg.magZero[axis] = (magZeroTempMin[axis] + magZeroTempMax[axis]) / 2;
-            writeParams();
+                cfg.magZero[axis] = ((magZeroTempMax[axis] - magZeroTempMin[axis]) / 2 - magZeroTempMax[axis]); // Calculate offsets
+            writeParams(1);
         }
     }
 }
