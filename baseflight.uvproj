@@ -446,6 +446,11 @@
               <FileType>1</FileType>
               <FilePath>.\src\spektrum.c</FilePath>
             </File>
+            <File>
+              <FileName>buzzer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\buzzer.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -505,6 +510,11 @@
               <FileName>drv_mpu6050.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\drv_mpu6050.c</FilePath>
+            </File>
+            <File>
+              <FileName>drv_mma845x.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\drv_mma845x.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1074,6 +1084,11 @@
               <FileType>1</FileType>
               <FilePath>.\src\spektrum.c</FilePath>
             </File>
+            <File>
+              <FileName>buzzer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\buzzer.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1133,6 +1148,11 @@
               <FileName>drv_mpu6050.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\drv_mpu6050.c</FilePath>
+            </File>
+            <File>
+              <FileName>drv_mma845x.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\drv_mma845x.c</FilePath>
             </File>
           </Files>
         </Group>
