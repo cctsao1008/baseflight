@@ -235,8 +235,11 @@ void bmp085_start_ut(void)
 uint16_t bmp085_get_ut(void)
 {
     uint16_t ut;
-    uint8_t data[2];    
+    uint8_t data[2];  
+
+    #ifdef NO_CCTSAO_CODE  
     uint16_t timeout = 10000;
+    #endif
 
     // wait in case of cockup
     if (!convDone)
@@ -268,7 +271,10 @@ uint32_t bmp085_get_up(void)
 {
     uint32_t up = 0;
     uint8_t data[3];
+    
+    #ifdef NO_CCTSAO_CODE
     uint16_t timeout = 10000;
+    #endif
     
     // wait in case of cockup
     if (!convDone)
